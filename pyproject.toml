@@ -5,5 +5,10 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "uvicorn>=0.38.0",
+    "bcrypt>=5.0.0",
+    "fastapi>=0.121.2",
+    "passlib>=1.7.4",
+    "pydantic>=2.12.4",
+    "python-jose[cryptography]>=3.5.0",
+    "uvicorn[standard]>=0.38.0",
 ]
