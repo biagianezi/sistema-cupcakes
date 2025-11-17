@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja de Cupcakes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        [data-page] {
+            display: none;
+        }
+        [data-page].active {
+            display: block;
+        }
+        .modal {
+            display: none;
+        }
+        .modal.active {
+            display: flex;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div id="app" class="min-h-screen">
+        
+        <nav class="bg-white shadow-md">
+            <div class="max-w-6xl mx-auto px-4">
+                <div class="flex justify-between items-center h-16">
+                    <span class="text-2xl font-bold text-pink-600">Cupcake Store</span>
+                    <div class="flex space-x-4">
+                        <a href="#" class="nav-link" data-nav="shop">Loja</a>
+                        <a href="#" class="nav-link" data-nav="cart">
+                            Carrinho (<span id="nav-cart-count">0</span>)
+                        </a>
+                        <a href="#" class="nav-link" data-nav="admin" data-auth="admin">Admin</a>
+                        <a href="#" class="nav-link" id="logout-button" data-auth="true">Sair</a>
+                        <a href="#" class="nav-link" data-nav="login" data-auth="false">Login</a>
+                        <a href="#" class="nav-link" data-nav="register" data-auth="false">Cadastro</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="py-10">
+
+            <div data-page="login" class="max-w-md mx-auto">
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Login</h2>
+                    <form id="login-form">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 mb-2" for="login-email">Email</label>
+                            <input class="w-full p-3 border rounded-lg" type="email" id="login-email" value="cliente@email.com" required>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-gray-700 mb-2" for="login-password">Senha</label>
+                            <input class="w-full p-3 border rounded-lg" type="password" id="login-password" value="1234" required>
+                        </div>
+                        <button type="submit" class="w-full bg-pink-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-pink-600 transition-colors">
+                            Entrar como Cliente
+                        </button>
+                    </form>
+                    <button id="admin-login-button" class="w-full bg-gray-700 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-800 transition-colors mt-4">
+                        Entrar como Admin
+                    </button>
+                    <p class="text-center mt-4">
+                        Não tem conta? <a href="#" class="text-pink-500 hover:underline" data-nav="register">Cadastre-se</a>
+                    </p>
+                </div>
+            </div>
+
+            <div data-page="register" class="max-w-md mx-auto">
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Cadastro</h2>
+                    <form id="register-form">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 mb-2" for="reg-nome">Nome Completo</label>
+                            <input class="w-full p-3 border rounded-lg" type="text" id="reg-nome" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 mb-2" for="reg-endereco">Endereço</label>
+                            <input class="w-full p-3 border rounded-lg" type="text" id="reg-endereco" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 mb-2" for="reg-email">Email</label>
+                            <input class="w-full p-3 border rounded-lg" type="email" id="reg-email" required>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-gray-700 mb-2" for="reg-password">Senha</label>
+                            <input class="w-full p-3 border rounded-lg" type="password" id="reg-password" required>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-gray-700 mb-2" for="reg-password-confirm">Confirmar Senha</label>
+                            <input class="w-full p-3 border rounded-lg" type="password" id="reg-password-confirm" required>
+                        </div>
+                        <button type="submit" class="w-full bg-pink-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-pink-600 transition-colors">
+                            Cadastrar
+                        </button>
+                    </form>
+                    <p class="text-center mt-4">
+                        Já tem conta? <a href="#" class="text-pink-500 hover:underline" data-nav="login">Faça Login</a>
+                    </p>
+                </div>
+            </div>
+
+            <div data-page="shop" class="max-w-6xl mx-auto px-4">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Vitrine de Cupcakes</h2>
+                <div id="shop-items" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <!-- Produtos serão carregados pela API -->
+                </div>
+            </div>
+
+            <div data-page="cart" class="max-w-3xl mx-auto px-4">
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-6">Meu Carrinho</h2>
+                    <div id="cart-items" class="mb-6">
+                        <p class="text-gray-500">Seu carrinho está vazio.</p>
+                    </div>
+                    <div class="border-t pt-4">
+                        <div class="flex justify-between items-center text-2xl font-bold mb-6">
+                            <span>Total:</span>
+                            <span id="cart-total">R$ 0,00</span>
+                        </div>
+                        <button id="checkout-button" class="w-full bg-green-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-600 transition-colors disabled:opacity-50" disabled>
+                            Finalizar Pedido
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div data-page="payment" class="max-w-md mx-auto">
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <h2 class="text-3xl font-bold text-center text-gray-800 mb-6">Pagamento</h2>
+                    <form id="payment-form">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 mb-2">Forma de Pagamento</label>
+                            <div class="flex space-x-4">
+                                <label class="flex items-center">
+                                    <input type="radio" name="payment-method" class="mr-2" checked> Cartão (Simulação)
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 mb-2" for="card-name">Nome no Cartão</label>
+                            <input class="w-full p-3 border rounded-lg" type="text" id="card-name">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 mb-2" for="card-number">Número do Cartão</label>
+                            <input class="w-full p-3 border rounded-lg" type="text" id="card-number">
+                        </div>
+                        <div class="flex space-x-4 mb-6">
+                            <div class="w-1/2">
+                                <label class="block text-gray-700 mb-2" for="card-expiry">Validade</label>
+                                <input class="w-full p-3 border rounded-lg" type="text" id="card-expiry" placeholder="MM/AA">
+                            </div>
+                            <div class="w-1/2">
+                                <label class="block text-gray-700 mb-2" for="card-cvv">CVV</label>
+                                <input class="w-full p-3 border rounded-lg" type="text" id="card-cvv">
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-green-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-600 transition-colors">
+                            Pagar Agora
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div data-page="confirmation" class="max-w-md mx-auto text-center">
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <h2 class="text-3xl font-bold text-green-500 mb-4">Pedido Confirmado!</h2>
+                    <p class="text-gray-700 text-lg mb-6">Obrigado pela sua compra. Seu pedido está sendo preparado!</p>
+                    <button class="w-full bg-pink-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-pink-600 transition-colors" data-nav="shop">
+                        Voltar para a Loja
+                    </button>
+                </div>
+            </div>
+
+            <div data-page="admin" class="max-w-6xl mx-auto px-4">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Dashboard</h2>
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-bold mb-4">Gerenciar Estoque</h3>
+                    <table class="w-full table-auto border-collapse">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="border p-2 text-left">Produto</th>
+                                <th class="border p-2 text-left">Estoque Atual</th>
+                                <th class="border p-2 text-left">Quantidade</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-stock-table">
+                           <!-- Dados do admin carregados pela API -->
+                        </tbody>
+                    </table>
+
+                    <h3 class="text-2xl font-bold mt-10 mb-4">Gerenciar Pedidos</h3>
+                    <table class="w-full table-auto border-collapse">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <th class="border p-2 text-left">Pedido ID</th>
+                                <th class="border p-2 text-left">Cliente (Email)</th>
+                                <th class="border p-2 text-left">Status</th>
+                                <th class="border p-2 text-left">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-orders-table">
+                            <!-- Pedidos do admin carregados pela API -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div id="modal" class="modal fixed inset-0 bg-black bg-opacity-50 items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full">
+            <p id="modal-message" class="text-center text-lg text-gray-800 mb-6"></p>
+            <button id="modal-close" class="w-full bg-pink-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-pink-600 transition-colors">
+                Fechar
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const API_URL = "http://127.0.0.1:8000";
+
+            const state = {
+                currentPage: 'shop',
+                isLoggedIn: false,
+                isAdmin: false,
+                cart: [], // Carrinho permanece local até o checkout
+                token: null,
+                loginRedirectPage: 'shop'
+            };
+
+            const modal = document.getElementById('modal');
+            const modalMessage = document.getElementById('modal-message');
+            const modalClose = document.getElementById('modal-close');
+            
+            const navCartCount = document.getElementById('nav-cart-count');
+            const cartItemsEl = document.getElementById('cart-items');
+            const cartTotalEl = document.getElementById('cart-total');
+            const checkoutButton = document.getElementById('checkout-button');
+
+            async function showPage(pageName) {
+                document.querySelectorAll('[data-page]').forEach(page => {
+                    page.classList.remove('active');
+                });
+                const newPage = document.querySelector(`[data-page="${pageName}"]`);
+                if (newPage) {
+                    newPage.classList.add('active');
+                    state.currentPage = pageName;
+                }
+                
+                if (pageName === 'shop') {
+                    await fetchProducts();
+                }
+                if (pageName === 'admin') {
+                    await fetchAdminData();
+                }
+                
+                updateNav();
+            }
+
+            function updateNav() {
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    const auth = link.getAttribute('data-auth');
+                    if (auth === 'true') {
+                        link.style.display = state.isLoggedIn ? 'block' : 'none';
+                    } else if (auth === 'false') {
+                        link.style.display = state.isLoggedIn ? 'none' : 'block';
+                    } else if (auth === 'admin') {
+                        link.style.display = state.isLoggedIn && state.isAdmin ? 'block' : 'none';
+                    }
+                });
+            }
+
+            function showMessage(message) {
+                modalMessage.textContent = message;
+                modal.classList.add('active');
+            }
+
+            modalClose.addEventListener('click', () => {
+                modal.classList.remove('active');
+            });
+
+            document.body.addEventListener('click', (e) => {
+                const navLink = e.target.closest('[data-nav]');
+                if (navLink) {
+                    e.preventDefault();
+                    const pageName = navLink.getAttribute('data-nav');
+                    showPage(pageName);
+                }
+            });
+
+            // --- Funções de API ---
+
+            async function fetchProducts() {
+                try {
+                    const response = await fetch(`${API_URL}/cupcakes`);
+                    if (!response.ok) throw new Error('Falha ao buscar produtos');
+                    const products = await response.json();
+                    renderProducts(products);
+                } catch (error) {
+                    showMessage(error.message);
+                }
+            }
+
+            function renderProducts(products) {
+                const shopItems = document.getElementById('shop-items');
+                shopItems.innerHTML = ''; // Limpa produtos antigos
+                products.forEach(product => {
+                    const card = document.createElement('div');
+                    card.className = "bg-white rounded-lg shadow-lg overflow-hidden";
+                    card.innerHTML = `
+                        <img src="${product.image_url}" alt="${product.name}" class="w-full h-48 object-cover">
+                        <div class="p-4">
+                            <h3 class="text-xl font-bold mb-2">${product.name}</h3>
+                            <p class="text-gray-700 mb-4">R$ ${product.price.toFixed(2)}</p>
+                            <button class="add-to-cart w-full bg-pink-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-pink-600 transition-colors"
+                                data-id="${product.id}" data-name="${product.name}" data-price="${product.price}">
+                                Adicionar ao Carrinho
+                            </button>
+                        </div>
+                    `;
+                    shopItems.appendChild(card);
+                });
+            }
+
+            async function handleLogin(e, isAdminLogin = false) {
+                e.preventDefault();
+                
+                const email = isAdminLogin ? "admin@email.com" : document.getElementById('login-email').value;
+                const password = isAdminLogin ? "adminpass" : document.getElementById('login-password').value;
+
+                try {
+                    const response = await fetch(`${API_URL}/token`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: new URLSearchParams({
+                            'username': email,
+                            'password': password
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Email ou senha inválidos.');
+                    }
+                    
+                    const data = await response.json();
+                    state.token = data.access_token;
+                    state.isLoggedIn = true;
+                    
+                    // Em um app real, /users/me retornaria os dados do usuário
+                    // Aqui, simulamos baseado no tipo de login
+                    state.isAdmin = isAdminLogin; 
+                    
+                    showMessage('Login realizado com sucesso!');
+                    
+                    if (isAdminLogin) {
+                        showPage('admin');
+                    } else {
+                        showPage(state.loginRedirectPage);
+                        state.loginRedirectPage = 'shop';
+                    }
+
+                } catch (error) {
+                    showMessage(error.message);
+                }
+            }
+
+            document.getElementById('login-form').addEventListener('submit', (e) => handleLogin(e, false));
+            document.getElementById('admin-login-button').addEventListener('click', (e) => handleLogin(e, true));
+
+            document.getElementById('register-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const nome = document.getElementById('reg-nome').value;
+                const endereco = document.getElementById('reg-endereco').value;
+                const email = document.getElementById('reg-email').value;
+                const password = document.getElementById('reg-password').value;
+                const passwordConfirm = document.getElementById('reg-password-confirm').value;
+
+                if (password !== passwordConfirm) {
+                    showMessage('As senhas não coincidem. Tente novamente.');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`${API_URL}/users/register`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password, nome, endereco })
+                    });
+                    
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.detail || 'Falha ao cadastrar');
+                    }
+                    
+                    showMessage('Cadastro realizado com sucesso! Faça o login.');
+                    showPage('login');
+
+                } catch (error) {
+                    showMessage(error.message);
+                }
+            });
+
+            document.getElementById('logout-button').addEventListener('click', (e) => {
+                e.preventDefault();
+                state.isLoggedIn = false;
+                state.isAdmin = false;
+                state.token = null;
+                // Mantém o carrinho
+                showPage('shop');
+            });
+            
+            document.getElementById('shop-items').addEventListener('click', (e) => {
+                const button = e.target.closest('.add-to-cart');
+                if (button) {
+                    const id = parseInt(button.dataset.id);
+                    const name = button.dataset.name;
+                    const price = parseFloat(button.dataset.price);
+                    
+                    const existingItem = state.cart.find(item => item.id === id);
+                    if (existingItem) {
+                        existingItem.quantity++;
+                    } else {
+                        state.cart.push({ id, name, price, quantity: 1 });
+                    }
+                    showMessage('Cupcake adicionado ao carrinho!');
+                    updateCart();
+                }
+            });
+            
+            function updateCart() {
+                if (state.cart.length === 0) {
+                    cartItemsEl.innerHTML = '<p class="text-gray-500">Seu carrinho está vazio.</p>';
+                    checkoutButton.disabled = true;
+                } else {
+                    cartItemsEl.innerHTML = '';
+                    state.cart.forEach(item => {
+                        const itemEl = document.createElement('div');
+                        itemEl.className = 'flex justify-between items-center mb-2 p-2 border-b';
+                        itemEl.innerHTML = `
+                            <div>
+                                <h4 class="font-bold">${item.name}</h4>
+                                <p class="text-sm text-gray-600">Qtd: ${item.quantity}</p>
+                            </div>
+                            <span class="font-bold">R$ ${(item.price * item.quantity).toFixed(2)}</span>
+                        `;
+                        cartItemsEl.appendChild(itemEl);
+                    });
+                    checkoutButton.disabled = false;
+                }
+                
+                const total = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                cartTotalEl.textContent = `R$ ${total.toFixed(2)}`;
+                navCartCount.textContent = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+            }
+            
+            checkoutButton.addEventListener('click', () => {
+                if (state.isLoggedIn && !state.isAdmin) {
+                    showPage('payment');
+                } else if (state.isAdmin) {
+                     showMessage('Admins não podem comprar. Saia e logue como cliente.');
+                } else {
+                    state.loginRedirectPage = 'cart';
+                    showMessage('Você precisa fazer login para finalizar o pedido.');
+                    showPage('login');
+                }
+            });
+            
+            document.getElementById('payment-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const orderData = {
+                    items: state.cart.map(item => ({
+                        cupcake_id: item.id,
+                        quantity: item.quantity
+                    }))
+                };
+
+                try {
+                    const response = await fetch(`${API_URL}/orders`, {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${state.token}` // Envia o token
+                        },
+                        body: JSON.stringify(orderData)
+                    });
+
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.detail || 'Falha ao processar pedido');
+                    }
+
+                    state.cart = [];
+                    updateCart();
+                    showPage('confirmation');
+
+                } catch (error) {
+                    showMessage(error.message);
+                }
+            });
+
+            // --- Funções do Admin ---
+            async function fetchAdminData() {
+                try {
+                    const [cupcakesRes, ordersRes] = await Promise.all([
+                        fetch(`${API_URL}/admin/cupcakes`, { headers: { 'Authorization': `Bearer ${state.token}` } }),
+                        fetch(`${API_URL}/admin/orders`, { headers: { 'Authorization': `Bearer ${state.token}` } })
+                    ]);
+                    
+                    if (!cupcakesRes.ok || !ordersRes.ok) throw new Error('Falha ao carregar dados do admin');
+                    
+                    const cupcakes = await cupcakesRes.json();
+                    const orders = await ordersRes.json();
+                    
+                    renderAdminStock(cupcakes);
+                    renderAdminOrders(orders);
+                } catch (error) {
+                    showMessage(error.message);
+                }
+            }
+            
+            function renderAdminStock(cupcakes) {
+                const tableBody = document.getElementById('admin-stock-table');
+                tableBody.innerHTML = '';
+                cupcakes.forEach(cupcake => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="border p-2">${cupcake.name}</td>
+                        <td class="border p-2">${cupcake.stock}</td>
+                        <td class="border p-2">
+                            <input type="number" class="border rounded p-1 w-20" value="${cupcake.stock}" id="stock-input-${cupcake.id}">
+                            <button class_:"bg-blue-500 text-white py-1 px-2 rounded hover:bg-blue-600" data-id="${cupcake.id}" data-action="update-stock">Salvar</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+            
+            function renderAdminOrders(orders) {
+                const tableBody = document.getElementById('admin-orders-table');
+                tableBody.innerHTML = '';
+                orders.forEach(order => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="border p-2">#${order.id}</td>
+                        <td class="border p-2">cliente@email.com</td> <!-- Simulado -->
+                        <td class="border p-2">${order.status}</td>
+                        <td class="border p-2">
+                            ${order.status === 'Pago' ? 
+                            `<button class="bg-green-500 text-white py-1 px-2 rounded hover:bg-green-600" data-id="${order.id}" data-action="update-status">
+                                Marcar como Entregue
+                            </button>` : 'N/A'}
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+
+            // Delegação de eventos para botões de admin
+            document.getElementById('admin-stock-table').addEventListener('click', async (e) => {
+                if (e.target.dataset.action === 'update-stock') {
+                    const id = e.target.dataset.id;
+                    const newStock = document.getElementById(`stock-input-${id}`).value;
+                    try {
+                        const response = await fetch(`${API_URL}/admin/cupcakes/${id}/stock?new_stock=${newStock}`, {
+                            method: 'PUT',
+                            headers: { 'Authorization': `Bearer ${state.token}` }
+                        });
+                        if (!response.ok) throw new Error('Falha ao atualizar estoque');
+                        showMessage('Estoque atualizado!');
+                        await fetchAdminData();
+                    } catch (error) {
+                        showMessage(error.message);
+                    }
+                }
+            });
+
+            document.getElementById('admin-orders-table').addEventListener('click', async (e) => {
+                if (e.target.dataset.action === 'update-status') {
+                    const id = e.target.dataset.id;
+                    try {
+                        const response = await fetch(`${API_URL}/admin/orders/${id}/status?new_status=Entregue`, {
+                            method: 'PUT',
+                            headers: { 'Authorization': `Bearer ${state.token}` }
+                        });
+                        if (!response.ok) throw new Error('Falha ao atualizar status');
+                        showMessage('Status do pedido atualizado!');
+                        await fetchAdminData();
+                    } catch (error) {
+                        showMessage(error.message);
+                    }
+                }
+            });
+
+
+            window.showMessage = showMessage;
+            showPage(state.currentPage);
+            updateNav();
+        });
+    </script>
+</body>
+</html>
